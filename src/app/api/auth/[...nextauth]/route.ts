@@ -2,11 +2,12 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { SupabaseAdapter } from "@auth/supabase-adapter";
 
-const handler = NextAuth({
+// 1. Başına 'export' ekleyerek dışarıdan erişilebilir hale getiriyoruz
+export const authOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID! as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET! as string,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
   adapter: SupabaseAdapter({
@@ -14,22 +15,22 @@ const handler = NextAuth({
     secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
   }) as any,
   session: {
-    strategy: "database",
-  },
-  jwt: {
-    encode: async () => "", 
-    decode: async () => null,
+    strategy: "jwt" as const, 
   },
   callbacks: {
-    async session({ session, user }) {
-      if (session?.user && user) {
-        session.user.id = user.id;
+    async jwt({ token, user }: { token: any; user?: any }) {
+      if (user) token.id = user.id;
+      return token;
+    },
+    async session({ session, token }: { session: any; token: any }) {
+      if (session.user) {
+        session.user.id = token.id as string;
       }
       return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true,
-});
+};
 
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
