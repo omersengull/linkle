@@ -5,6 +5,7 @@ import { z } from "zod";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import normalizeUrl from "normalize-url";
 // Saniyede 1000 istek gelmesini engellemek için Redis tabanlı kısıtlayıcı
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
@@ -32,17 +33,22 @@ export async function POST(request: Request) {
       );
     }
     const { originalUrl }: { originalUrl: string } = await request.json();
+    const normalized = normalizeUrl(originalUrl, {
+      stripWWW: true, // İsteğe bağlı: www kalsın mı silinsin mi?
+      removeTrailingSlash: true, // Sondaki '/' işaretini kaldırır
+      forceHttps: true, // http girilse bile https olarak kaydeder
+    });
     // Kullanıcıdan gelen url db'de zaten var mı diye kontrol ediyoruz
     const { data: existingEntry } = await supabase
       .from('urls')
       .select('short_code')
-      .eq('original_url', originalUrl)
-      .single();
+      .eq('original_url', normalized)
+      .maybeSingle();
     if (existingEntry) {
       return NextResponse.json({ shortCode: existingEntry.short_code });
     }
 
-    if (!urlSchema.safeParse(originalUrl).success) {
+    if (!urlSchema.safeParse(normalized).success) {
       return NextResponse.json(
         { error: "Geçersiz bir URL girdiniz" },
         { status: 400 },
@@ -54,14 +60,14 @@ export async function POST(request: Request) {
     // 2. PostgreSQL'e kaydet
     const { data, error } = await supabase
       .from("urls") // SQL'de oluşturduğun tablonun adı
-      .insert([{ original_url: originalUrl, short_code: shortCode, user_id:userId}])
+      .insert([{ original_url: normalized, short_code: shortCode, user_id:userId}])
       .select()
       .single();
     if (error) throw error;
     
 
     // 3. Kullanıcıya kısa kodu geri gönder
-    return NextResponse.json({ shortCode: data[0].short_code });
+    return NextResponse.json({ shortCode: data.short_code });
   } catch (error:any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

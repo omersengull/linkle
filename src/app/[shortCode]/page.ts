@@ -1,5 +1,10 @@
 import { supabase } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
+import { createClient } from "@supabase/supabase-js";
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY! // Bu anahtar RLS'i bypass eder.
+);
 interface RedirectPageProps {
   params: Promise<{ shortCode: string }>;
 }
@@ -21,9 +26,9 @@ export default async function RedirectPage({ params } : RedirectPageProps) {
   }
 
   // 4. (Opsiyonel ama seni öne çıkaracak kısım) Tıklama sayısını +1 artır
-  await supabase
+  await supabaseAdmin
     .from('urls')
-    .update({ clicks: data.clicks + 1 })
+    .update({ clicks: (data.clicks || 0) + 1 })
     .eq('short_code', shortCode);
     
 

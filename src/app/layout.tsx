@@ -4,6 +4,7 @@ import "./globals.css";
 import Footer from "@/components/Footer";
 import { Toaster } from 'react-hot-toast';
 import { Providers } from "@/components/Providers";
+import SyncObserver from "@/components/SyncObserver";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,7 +20,8 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body className={`${inter.className} bg-gray-900 text-white antialiased`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <SyncObserver />{children}</Providers>
         <Toaster position="top-right" reverseOrder={false} />
         <Footer/>
       </body>

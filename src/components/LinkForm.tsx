@@ -1,13 +1,17 @@
 "use client";
 import React, { useState } from "react";
 import CopyButton from "./CopyButton";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, ShieldCheck } from "lucide-react";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
+import AuthModal from "./AuthModal";
+import { useSession } from "next-auth/react";
 const LinkForm = () => {
+  const { data: session } = useSession();
   const [url, setUrl] = useState("");
   const [shortLink, setShortLink] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -20,13 +24,22 @@ const LinkForm = () => {
         body: JSON.stringify({ originalUrl: url }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Bir hata oluştu.");
+      if (res.ok && data?.shortCode) {
+        setShortLink(`${window.location.origin}/${data.shortCode}`);
+        if (!session) {
+          const pendingLinks = JSON.parse(
+            localStorage.getItem("pending_links") || "[]",
+          );
+          pendingLinks.push(data.shortCode); // veya veritabanı ID'si
+          localStorage.setItem("pending_links", JSON.stringify(pendingLinks));
+        }
+        setUrl("");
+        toast.success("Link oluşturuldu!");
+      } else {
+        throw new Error(
+          data?.error || "Link oluşturulurken bir veri hatası oluştu.",
+        );
       }
-
-      setShortLink(`${window.location.origin}/${data.shortCode}`);
-      toast.success("Link başarıyla kısaltıldı!");
-      setUrl(""); // Input'u temizle
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -36,6 +49,7 @@ const LinkForm = () => {
 
   return (
     <div>
+      <AuthModal isOpen={isAuthModalOpen} setIsOpen={setIsAuthModalOpen} />
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
         <input
           type="url"
@@ -67,22 +81,59 @@ const LinkForm = () => {
       </form>
 
       {/* Kısa Link Sonuç Alanı */}
-      {shortLink && (
-        <div className="mt-6 p-4 bg-gray-700/50 border border-gray-600 rounded-lg flex flex-col sm:flex-row items-center justify-between animate-in fade-in zoom-in duration-300">
-          <p className="text-lg text-white mb-2 sm:mb-0">
-            Kısa Linkin:{" "}
-            <a
-              className="font-mono text-green-400 hover:underline"
-              href={shortLink}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {shortLink}
-            </a>
-          </p>
-          <CopyButton text={shortLink} />
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        {shortLink && (
+          <motion.div
+            key={shortLink} // Link her değiştiğinde animasyonun tekrar etmesi için key şart
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="mt-6 space-y-4"
+          >
+            {/* Sonuç Kartı */}
+            <div className="p-4 bg-gray-800/50 backdrop-blur-md border border-gray-700 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+              <div className="flex flex-col overflow-hidden">
+                <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">
+                  Kısa Linkin
+                </span>
+                <a
+                  className="font-mono text-lg text-green-400 hover:text-green-300 transition-colors truncate"
+                  href={shortLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {shortLink}
+                </a>
+              </div>
+              <CopyButton text={shortLink} />
+            </div>
+
+            {/* Giriş Teşvik Banner'ı (Sadece oturum yoksa) */}
+            {!session && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }} // Karttan biraz sonra gelsin
+                onClick={() => setIsAuthModalOpen(true)}
+                className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl cursor-pointer hover:bg-blue-500/20 transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-sm">
+                    <ShieldCheck className="text-blue-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-gray-300">
+                      Bu linkin istatistiklerini takip etmek ister misin?
+                    </span>
+                  </div>
+                  <span className="text-xs font-bold text-blue-500 uppercase tracking-tighter">
+                    Giriş Yap
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

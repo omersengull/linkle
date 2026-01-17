@@ -10,18 +10,26 @@ const handler = NextAuth({
     }),
   ],
   adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL! as string,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY! as string, // Bu key önemli!
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
   }) as any,
+  session: {
+    strategy: "database",
+  },
+  jwt: {
+    encode: async () => "", 
+    decode: async () => null,
+  },
   callbacks: {
     async session({ session, user }) {
-      if (session.user) {
+      if (session?.user && user) {
         session.user.id = user.id;
       }
       return session;
     },
   },
-  debug: process.env.NODE_ENV === "development",
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: true,
 });
 
 export { handler as GET, handler as POST };

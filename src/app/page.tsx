@@ -4,7 +4,7 @@ import LinkForm from "@/components/LinkForm";
 import { ArrowUpRight, Copy, Link as LinkIcon, Globe } from "lucide-react";
 import Link from "next/link";
 import CopyButton from "@/components/CopyButton";
-
+import AuthModal from "@/components/AuthModal";
 // async function getRecentUrls(): Promise<UrlEntry[]> {
 //   const { data, error } = await supabase
 //     .from("urls")
@@ -36,11 +36,11 @@ export default async function Home() {
             Hızlı ve basit bir şekilde linklerinizi kısaltın ve paylaşın.
           </p>
         </div>
-
+        
         <div className="bg-gray-800 border border-gray-700 shadow-lg rounded-2xl p-6 sm:p-8 mb-12">
           <LinkForm />
         </div>
-
+        
         {/* <div className="space-y-6">
           <h2 className="text-2xl font-semibold text-white text-center">
             Son Kısaltılan Linkler
@@ -89,5 +89,5 @@ export default async function Home() {
         </div> */}
       </main>
     </div>
-);
+  );
 }
