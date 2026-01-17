@@ -1,11 +1,36 @@
 import { supabase } from "@/lib/supabase";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
-
+import { getServerSession } from "next-auth";
+// Saniyede 1000 istek gelmesini engellemek için Redis tabanlı kısıtlayıcı
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "60 s"), // 60 saniyede en fazla 5 istek
+  analytics: true,
+});
 const urlSchema = z.string().url();
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession();
+    const userId = session?.user?.id || null;
+    const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    const { success, limit, reset, remaining } = await ratelimit.limit(ip);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Çok fazla istek gönderdiniz. Lütfen bir dakika bekleyin." },
+        { 
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": limit.toString(),
+            "X-RateLimit-Remaining": remaining.toString(),
+            "X-RateLimit-Reset": reset.toString(),
+          }
+        }
+      );
+    }
     const { originalUrl }: { originalUrl: string } = await request.json();
     // Kullanıcıdan gelen url db'de zaten var mı diye kontrol ediyoruz
     const { data: existingEntry } = await supabase
@@ -29,7 +54,7 @@ export async function POST(request: Request) {
     // 2. PostgreSQL'e kaydet
     const { data, error } = await supabase
       .from("urls") // SQL'de oluşturduğun tablonun adı
-      .insert([{ original_url: originalUrl, short_code: shortCode }])
+      .insert([{ original_url: originalUrl, short_code: shortCode, user_id:userId}])
       .select()
       .single();
     if (error) throw error;

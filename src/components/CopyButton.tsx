@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { Clipboard } from "lucide-react";
+import { Copy, Check } from "lucide-react";
+
 export default function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -11,11 +12,16 @@ export default function CopyButton({ text }: { text: string }) {
   };
 
   return (
-    <button onClick={handleCopy} className="text-xs text-black p-1">
-      <div className="flex items-center justify-center border rounded-lg text-white px-3 py-2 bg-blue-500">
-        <Clipboard style={{ marginRight: "2px" }} size={18} />
-        {copied ? "Kopyalandı!" : "Kopyala"}
-      </div>
+    <button
+      onClick={handleCopy}
+      className="p-2 rounded-lg cursor-pointer bg-gray-600 hover:bg-gray-500 text-white transition-colors"
+      aria-label="Kopyala"
+    >
+      {copied ? (
+        <Check className="w-5 h-5 text-green-400" />
+      ) : (
+        <Copy className="w-5 h-5" />
+      )}
     </button>
   );
 }
