@@ -8,8 +8,7 @@ import { authOptions } from "./api/auth/[...nextauth]/route";
 import { getUserLinks } from "@/lib/actions";
 import CopyButton from "@/components/CopyButton";
 import UserStats from "@/components/UserStats";
-import { useSearchParams } from "next/navigation";
-import toast from "react-hot-toast";
+import ErrorToastHandler from "@/components/ErrorToastHandler";
 // async function getRecentUrls(): Promise<UrlEntry[]> {
 //   const { data, error } = await supabase
 //     .from("urls")
@@ -22,10 +21,6 @@ import toast from "react-hot-toast";
 // }
 export const dynamic = "force-dynamic";
 export default async function Home() {
-  const searchParams = useSearchParams();
-  if (searchParams.get("error") === "not_found") {
-    toast.error("Aradığınız kısa link bulunamadı!");
-  }
   const session = await getServerSession(authOptions);
   // const recentUrls = await getRecentUrls();
   let userLinks = [];
@@ -35,7 +30,9 @@ export default async function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4 sm:p-6 md:p-8 pb-32">
       <SessionObserver />
+      <ErrorToastHandler/>
       <AuthButton />
+      
       <main className="max-w-4xl w-full">
         <div className="text-center mb-12">
           <Link
