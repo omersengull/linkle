@@ -41,15 +41,7 @@ export async function POST(request: Request) {
       removeTrailingSlash: true, // Sondaki '/' işaretini kaldırır
       forceHttps: true, // http girilse bile https olarak kaydeder
     });
-    // Kullanıcıdan gelen url db'de zaten var mı diye kontrol ediyoruz
-    const { data: existingEntry } = await supabase
-      .from('urls')
-      .select('short_code')
-      .eq('original_url', normalized)
-      .maybeSingle();
-    if (existingEntry) {
-      return NextResponse.json({ shortCode: existingEntry.short_code });
-    }
+    
 
     if (!urlSchema.safeParse(normalized).success) {
       return NextResponse.json(
@@ -58,7 +50,7 @@ export async function POST(request: Request) {
       );
     }
     // 1. 6 haneli rastgele kod üret (Örn: aB2c8X)
-    const shortCode = nanoid(6);
+    const shortCode = nanoid(7);
 
     // 2. PostgreSQL'e kaydet
     const { data, error } = await supabaseAdmin
