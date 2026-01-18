@@ -8,13 +8,13 @@ export default function Footer() {
 
   return (
     <footer
-      className={`fixed bottom-0 left-0 w-full z-50 border-t border-white/5 bg-[rgb(30,41,59)] transition-all duration-500 ease-in-out ${isExpanded ? "py-8" : "py-4"}`}
+      className={`fixed bottom-0 left-0 w-full z-50 border-t border-white/5 bg-[rgb(30,41,59)] transition-all px-4 sm:px-8 duration-500 ease-in-out ${isExpanded ? "py-8" : "py-4"}`}
     >
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center">
           {/* SOL: Logo ve Slogan */}
           <div
-            className={`flex items-center transition-all duration-500 ${isExpanded ? "flex-col items-start space-y-2" : "flex-row gap-4"}`}
+            className={`flex items-center transition-all duration-500 overflow-hidden ${isExpanded ? "flex-col items-start space-y-2" : "flex-row gap-4"}`}
           >
             <Link href="/" className="group flex items-center gap-2">
               <span
@@ -50,7 +50,7 @@ export default function Footer() {
             {/* Genişlet/Küçült Butonu - Her zaman en sağda */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] text-slate-500 hover:text-blue-400 transition-colors flex items-center gap-1.5 bg-white/5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full border border-white/10 active:scale-95 transition-transform"
+              className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] text-slate-500 hover:text-blue-400 transition-colors flex items-center gap-1.5 bg-white/5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full border shrink-0 border-white/10 active:scale-95 transition-transform"
             >
               {isExpanded ? (
                 <>
