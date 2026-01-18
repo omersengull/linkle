@@ -50,7 +50,7 @@ export default function Footer() {
             {/* Genişlet/Küçült Butonu - Her zaman en sağda */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] text-slate-500 hover:text-blue-400 transition-colors flex items-center gap-1.5 bg-white/5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full border shrink-0 border-white/10 active:scale-95 transition-transform"
+              className="text-[9px] sm:text-[10px] uppercase cursor-pointer tracking-[0.15em] sm:tracking-[0.2em] text-slate-500 hover:text-blue-400 transition-colors flex items-center gap-1.5 bg-white/5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full border shrink-0 border-white/10 active:scale-95 transition-transform"
             >
               {isExpanded ? (
                 <>

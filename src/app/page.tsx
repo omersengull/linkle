@@ -8,6 +8,8 @@ import { authOptions } from "./api/auth/[...nextauth]/route";
 import { getUserLinks } from "@/lib/actions";
 import CopyButton from "@/components/CopyButton";
 import UserStats from "@/components/UserStats";
+import { useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 // async function getRecentUrls(): Promise<UrlEntry[]> {
 //   const { data, error } = await supabase
 //     .from("urls")
@@ -20,6 +22,10 @@ import UserStats from "@/components/UserStats";
 // }
 export const dynamic = "force-dynamic";
 export default async function Home() {
+  const searchParams = useSearchParams();
+  if (searchParams.get("error") === "not_found") {
+    toast.error("Aradığınız kısa link bulunamadı!");
+  }
   const session = await getServerSession(authOptions);
   // const recentUrls = await getRecentUrls();
   let userLinks = [];
@@ -45,7 +51,7 @@ export default async function Home() {
             Hızlı ve basit bir şekilde linklerinizi kısaltın ve paylaşın.
           </p>
         </div>
-        
+
         <div className="bg-gray-800 border border-gray-700 shadow-lg rounded-2xl p-6 sm:p-8 mb-12">
           <LinkForm />
         </div>
@@ -55,27 +61,40 @@ export default async function Home() {
               <span className="w-2 h-8 bg-blue-500 rounded-full"></span>
               Senin Linklerin
             </h2>
-            
+
             <UserStats links={userLinks} />
 
             <div className="space-y-4">
               {userLinks.map((link) => (
-                <div key={link.id} className="bg-gray-800 border border-gray-700 p-5 rounded-2xl flex items-center justify-between group hover:border-gray-600 transition-all">
+                <div
+                  key={link.id}
+                  className="bg-gray-800 border border-gray-700 p-5 rounded-2xl flex items-center justify-between group hover:border-gray-600 transition-all"
+                >
                   <div className="overflow-hidden mr-4">
-                    <a target="_blank" href={`${process.env.NEXT_PUBLIC_BASE_URL}/${link.short_code}`} className="text-blue-400 font-mono truncate">{process.env.NEXT_PUBLIC_BASE_URL}/{link.short_code}</a>
-                    <p className="text-gray-500 text-sm truncate">{link.original_url}</p>
+                    <a
+                      target="_blank"
+                      href={`${process.env.NEXT_PUBLIC_BASE_URL}/${link.short_code}`}
+                      className="text-blue-400 font-mono truncate"
+                    >
+                      {process.env.NEXT_PUBLIC_BASE_URL}/{link.short_code}
+                    </a>
+                    <p className="text-gray-500 text-sm truncate">
+                      {link.original_url}
+                    </p>
                   </div>
                   <div className="flex items-center gap-4 shrink-0">
                     <span className="text-sm text-gray-400 bg-gray-900 px-3 py-1 rounded-full">
                       {link.clicks || 0} tıklama
                     </span>
-                    <CopyButton text={`${process.env.NEXT_PUBLIC_BASE_URL}/${link.short_code}`} />
+                    <CopyButton
+                      text={`${process.env.NEXT_PUBLIC_BASE_URL}/${link.short_code}`}
+                    />
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        ) }
+        )}
         <div className="h-24 w-full" aria-hidden="true" />
         {/* <div className="space-y-6">
           <h2 className="text-2xl font-semibold text-white text-center">

@@ -21,27 +21,33 @@ export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
     const userId = session?.user?.id || null;
     const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
-    const { success, limit, reset, remaining } = await ratelimit.limit(ip);
+    const identifier = userId ? `user:${userId}` : `ip:${ip}`;
+    const { success, limit, reset, remaining } = await ratelimit.limit(identifier);
     if (!success) {
       return NextResponse.json(
         { error: "Çok fazla istek gönderdiniz. Lütfen bir dakika bekleyin." },
-        { 
+        {
           status: 429,
           headers: {
             "X-RateLimit-Limit": limit.toString(),
             "X-RateLimit-Remaining": remaining.toString(),
             "X-RateLimit-Reset": reset.toString(),
-          }
-        }
+          },
+        },
       );
     }
-    const { originalUrl }: { originalUrl: string } = await request.json();
+    let { originalUrl }: { originalUrl: string } = await request.json();
+    if (
+      !originalUrl.startsWith("http://") &&
+      !originalUrl.startsWith("https://")
+    ) {
+      originalUrl = `https://${originalUrl}`;
+    }
     const normalized = normalizeUrl(originalUrl, {
       stripWWW: true, // İsteğe bağlı: www kalsın mı silinsin mi?
       removeTrailingSlash: true, // Sondaki '/' işaretini kaldırır
       forceHttps: true, // http girilse bile https olarak kaydeder
     });
-    
 
     if (!urlSchema.safeParse(normalized).success) {
       return NextResponse.json(
@@ -49,13 +55,35 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
+    if (userId) {
+      // 1. Bu kullanıcı bu linki daha önce eklemiş mi?
+      const { data: existingLink } = await supabaseAdmin
+        .from("urls")
+        .select("short_code")
+        .eq("original_url", normalized)
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (existingLink) {
+        // Varsa, eski kodu döndür (Yeni satır ekleme)
+        return NextResponse.json({ shortCode: existingLink.short_code });
+      }
+    }
+
     // 1. 6 haneli rastgele kod üret (Örn: aB2c8X)
     const shortCode = nanoid(7);
 
     // 2. PostgreSQL'e kaydet
     const { data, error } = await supabaseAdmin
       .from("urls") // SQL'de oluşturduğun tablonun adı
-      .insert([{ original_url: normalized, short_code: shortCode, user_id:session?.user?.id || null}])
+      .insert([
+        {
+          original_url: normalized,
+          short_code: shortCode,
+          user_id: session?.user?.id || null,
+        },
+      ])
       .select()
       .single();
     if (error) throw error;
@@ -63,7 +91,7 @@ export async function POST(request: Request) {
 
     // 3. Kullanıcıya kısa kodu geri gönder
     return NextResponse.json({ shortCode: data.short_code });
-  } catch (error:any) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

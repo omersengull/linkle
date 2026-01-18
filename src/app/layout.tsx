@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { Toaster } from 'react-hot-toast';
 import { Providers } from "@/components/Providers";
 import SyncObserver from "@/components/SyncObserver";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

@@ -22,9 +22,9 @@ export default async function RedirectPage({ params } : RedirectPageProps) {
 
   // 3. Eğer kod yoksa ana sayfaya veya 404'e gönder
   if (error || !data) {
-    redirect('/');
+    redirect("/?error=not_found");
   }
-
+ 
   // 4. (Opsiyonel ama seni öne çıkaracak kısım) Tıklama sayısını +1 artır
   await supabaseAdmin
     .from('urls')
