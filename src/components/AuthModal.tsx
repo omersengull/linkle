@@ -2,6 +2,7 @@
 import { signIn } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShieldCheck } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -9,6 +10,14 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, setIsOpen }: AuthModalProps) {
+  const handleLogin = async () => {
+  try {
+    // Sadece girişi başlatıyoruz, mesaj işini yukarıdaki "Observer" yapacak
+    await signIn("google"); 
+  } catch (error) {
+    toast.error("Beklenmedik bir hata oluştu.");
+  }
+};
   return (
     <AnimatePresence>
       {isOpen && (
@@ -20,7 +29,7 @@ export default function AuthModal({ isOpen, setIsOpen }: AuthModalProps) {
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
             // Blur yerine sadece hafif bir karartma kullanmak FPS'i %50 artırır
-            className="absolute inset-0 bg-black/60 transform-gpu" 
+            className="absolute inset-0 bg-black/60 transform-gpu"
           />
 
           {/* Modal Kutu */}
@@ -34,9 +43,9 @@ export default function AuthModal({ isOpen, setIsOpen }: AuthModalProps) {
               duration: 0.25,
             }}
             // GPU'yu doğrudan bu elemente odaklanmaya zorlar
-            style={{ 
-                willChange: "transform, opacity",
-                transform: "translateZ(0)" 
+            style={{
+              willChange: "transform, opacity",
+              transform: "translateZ(0)",
             }}
             className="relative bg-gray-900 border border-gray-800 p-8 rounded-[2rem] 
                        max-w-sm w-full text-center z-[101]
@@ -61,7 +70,7 @@ export default function AuthModal({ isOpen, setIsOpen }: AuthModalProps) {
             </p>
 
             <button
-              onClick={() => signIn("google")}
+              onClick={handleLogin}
               className="flex cursor-pointer items-center justify-center gap-3 w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-gray-100 transition-all active:scale-95"
             >
               <img

@@ -6,12 +6,15 @@ import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthModal from "./AuthModal";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 const LinkForm = () => {
   const { data: session } = useSession();
+  const router = useRouter();
   const [url, setUrl] = useState("");
   const [shortLink, setShortLink] = useState("");
   const [loading, setLoading] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -35,6 +38,7 @@ const LinkForm = () => {
         }
         setUrl("");
         toast.success("Link oluşturuldu!");
+        router.refresh();
       } else {
         throw new Error(
           data?.error || "Link oluşturulurken bir veri hatası oluştu.",

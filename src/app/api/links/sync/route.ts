@@ -8,7 +8,6 @@ export async function POST(request: Request) {
   try {
     // ÖNEMLİ: getServerSession'a authOptions'ı geçmelisin
     const session = await getServerSession(authOptions);
-
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
     }

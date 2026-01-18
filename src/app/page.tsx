@@ -1,10 +1,13 @@
-import { supabase } from "@/lib/supabase";
-import { UrlEntry } from "@/types/database";
 import LinkForm from "@/components/LinkForm";
-import { ArrowUpRight, Copy, Link as LinkIcon, Globe } from "lucide-react";
+import { Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
+import SessionObserver from "@/components/SessionObserver";
+import AuthButton from "@/components/AuthButton";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/route";
+import { getUserLinks } from "@/lib/actions";
 import CopyButton from "@/components/CopyButton";
-import AuthModal from "@/components/AuthModal";
+import UserStats from "@/components/UserStats";
 // async function getRecentUrls(): Promise<UrlEntry[]> {
 //   const { data, error } = await supabase
 //     .from("urls")
@@ -15,12 +18,18 @@ import AuthModal from "@/components/AuthModal";
 //   if (error) return [];
 //   return data as UrlEntry[];
 // }
-
+export const dynamic = "force-dynamic";
 export default async function Home() {
+  const session = await getServerSession(authOptions);
   // const recentUrls = await getRecentUrls();
-
+  let userLinks = [];
+  if (session?.user?.id) {
+    userLinks = await getUserLinks(session.user.id);
+  }
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4 sm:p-6 md:p-8">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4 sm:p-6 md:p-8 pb-32">
+      <SessionObserver />
+      <AuthButton />
       <main className="max-w-4xl w-full">
         <div className="text-center mb-12">
           <Link
@@ -40,7 +49,34 @@ export default async function Home() {
         <div className="bg-gray-800 border border-gray-700 shadow-lg rounded-2xl p-6 sm:p-8 mb-12">
           <LinkForm />
         </div>
-        
+        {session && (
+          <div className="mt-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+              <span className="w-2 h-8 bg-blue-500 rounded-full"></span>
+              Senin Linklerin
+            </h2>
+            
+            <UserStats links={userLinks} />
+
+            <div className="space-y-4">
+              {userLinks.map((link) => (
+                <div key={link.id} className="bg-gray-800 border border-gray-700 p-5 rounded-2xl flex items-center justify-between group hover:border-gray-600 transition-all">
+                  <div className="overflow-hidden mr-4">
+                    <a target="_blank" href={`${process.env.NEXT_PUBLIC_BASE_URL}/${link.short_code}`} className="text-blue-400 font-mono truncate">{process.env.NEXT_PUBLIC_BASE_URL}/{link.short_code}</a>
+                    <p className="text-gray-500 text-sm truncate">{link.original_url}</p>
+                  </div>
+                  <div className="flex items-center gap-4 shrink-0">
+                    <span className="text-sm text-gray-400 bg-gray-900 px-3 py-1 rounded-full">
+                      {link.clicks || 0} tıklama
+                    </span>
+                    <CopyButton text={`${process.env.NEXT_PUBLIC_BASE_URL}/${link.short_code}`} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) }
+        <div className="h-24 w-full" aria-hidden="true" />
         {/* <div className="space-y-6">
           <h2 className="text-2xl font-semibold text-white text-center">
             Son Kısaltılan Linkler

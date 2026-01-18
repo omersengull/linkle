@@ -6,6 +6,9 @@ import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import normalizeUrl from "normalize-url";
+import { revalidatePath } from "next/cache";
+import { supabaseAdmin } from "@/lib/supabase";
+import { authOptions } from "../auth/[...nextauth]/route";
 // Saniyede 1000 istek gelmesini engellemek için Redis tabanlı kısıtlayıcı
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
@@ -15,7 +18,7 @@ const ratelimit = new Ratelimit({
 const urlSchema = z.string().url();
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     const userId = session?.user?.id || null;
     const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
     const { success, limit, reset, remaining } = await ratelimit.limit(ip);
@@ -58,13 +61,13 @@ export async function POST(request: Request) {
     const shortCode = nanoid(6);
 
     // 2. PostgreSQL'e kaydet
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("urls") // SQL'de oluşturduğun tablonun adı
-      .insert([{ original_url: normalized, short_code: shortCode, user_id:userId}])
+      .insert([{ original_url: normalized, short_code: shortCode, user_id:session?.user?.id || null}])
       .select()
       .single();
     if (error) throw error;
-    
+    revalidatePath("/");
 
     // 3. Kullanıcıya kısa kodu geri gönder
     return NextResponse.json({ shortCode: data.short_code });
