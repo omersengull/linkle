@@ -97,15 +97,16 @@ const LinkForm = () => {
           >
             {/* Sonuç Kartı */}
             <div className="p-4 bg-gray-800/50 backdrop-blur-md border border-gray-700 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
-              <div className="flex flex-col overflow-hidden">
+              <div className="flex flex-col overflow-hidden w-full sm:w-auto">
                 <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">
                   Kısa Linkin
                 </span>
                 <a
-                  className="font-mono text-lg text-green-400 hover:text-green-300 transition-colors truncate"
+                  className="font-mono text-lg text-green-400 hover:text-green-300 transition-colors truncate block max-w-[250px] sm:max-w-md"
                   href={shortLink}
                   target="_blank"
                   rel="noopener noreferrer"
+                  title={shortLink} // Üzerine gelince tamamı görünsün diye
                 >
                   {shortLink}
                 </a>

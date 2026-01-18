@@ -38,7 +38,7 @@ export default function Footer() {
             {/* Genişlet/Küçült Butonu - Her zaman en sağda */}
             <button 
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-[10px] uppercase tracking-[0.2em] text-slate-500 hover:text-blue-400 transition-colors flex items-center gap-1 bg-white/5 px-4 py-1.5 rounded-full border border-white/10"
+              className="xs:text-[10px] text-[6px] uppercase tracking-[0.2em] text-slate-500 hover:text-blue-400 transition-colors flex items-center gap-1 bg-white/5 px-4 py-1.5 rounded-full border border-white/10"
             >
               {isExpanded ? (
                 <>Küçült <span className="rotate-180 transition-transform inline-block">↑</span></>
