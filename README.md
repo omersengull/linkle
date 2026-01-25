@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-## Getting Started
+# 🔗 Linkle - Modern URL Shortener
 
-First, run the development server:
+Linkle is a modern web application that transforms long, complex web addresses into stylish, short, and trackable links in seconds.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+🚀 **[View Live Demo](https://link-le.vercel.app)**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📸 Screenshots
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Desktop View | Mobile Responsiveness |
+| :---: | :---: |
+| <img src="./public/screenshots/foto1.png" width="400"> | <img src="./public/screenshots/mobil1.jpeg" width="200">  |
+| <img src="./public/screenshots/foto2.png" width="400"> | <img src="./public/screenshots/mobil2.jpeg" width="200"> |
+| <img src="./public/screenshots/foto3.png" width="400"> | <img src="./public/screenshots/mobil3.jpeg" width="200"> |
+| <img src="./public/screenshots/foto4.png" width="400"> | <img src="./public/screenshots/mobil4.jpeg" width="200"> |
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## ✨ Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- ⚡ **Fast Shortening:** Secure and unique short code generation using `nanoid`.
+- 🛡️ **Security & Rate Limiting:** 5 requests per 60 seconds limit using Upstash Redis.
+- 👤 **User Dashboard:** Manage your own links by signing in with Google Auth (NextAuth).
+- 📊 **Analytics Tracking:** View real-time total click counts for each link.
+- 🔄 **Smart Synchronization:** Automatically sync links created while signed out to your account once you log in.
+- 📱 **Fully Responsive:** Flawless experience across all screen sizes.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** Next.js 15 (App Router), React, Tailwind CSS, Framer Motion
+- **Backend:** Next.js API Routes, Supabase (PostgreSQL)
+- **Language:** TypeScript
+- **Auth:** Next-Auth (Google Provider)
+- **Storage/Cache:** Redis (Upstash)
+- **Validation:** Zod
