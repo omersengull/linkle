@@ -48,3 +48,21 @@ Linkle is a modern web application that transforms long, complex web addresses i
 - **Auth:** Next-Auth (Google Provider)
 - **Storage/Cache:** Redis (Upstash)
 - **Validation:** Zod
+
+## ⚙️ Installation
+
+1-Clone the repository:
+git clone https://github.com/omersengull/linkle.git
+
+2-Install dependencies:
+bun install  # or npm install
+
+3-Set up environment variables: Create a .env.local file and add your GitHub token if needed for higher rate limits.
+
+4-Run the development server:
+bun dev
+
+
+## 📄 License
+
+This project is licensed under the MIT License.
