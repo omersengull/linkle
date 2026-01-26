@@ -22,13 +22,12 @@ export default function AuthModal({ isOpen, setIsOpen }: AuthModalProps) {
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 antialiased">
-          {/* Arka Plan - Blur miktarını iyice düşürdük veya kaldırdık */}
+         
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
-            // Blur yerine sadece hafif bir karartma kullanmak FPS'i %50 artırır
             className="absolute inset-0 bg-black/60 transform-gpu"
           />
 
@@ -42,7 +41,6 @@ export default function AuthModal({ isOpen, setIsOpen }: AuthModalProps) {
               ease: "easeOut",
               duration: 0.25,
             }}
-            // GPU'yu doğrudan bu elemente odaklanmaya zorlar
             style={{
               willChange: "transform, opacity",
               transform: "translateZ(0)",

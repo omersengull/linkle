@@ -10,14 +10,13 @@ export default function SessionObserver() {
 
   useEffect(() => {
     if (status === "authenticated" && session?.user?.email) {
-      // 1. HOŞ GELDİN MESAJI (Senin kodun)
       const storageKey = `welcome_shown_${session.user.email}`;
       if (!localStorage.getItem(storageKey)) {
         toast.success(`Hoş geldin, ${session.user.name}!`, { icon: "👋" });
         localStorage.setItem(storageKey, "true");
       }
 
-      // 2. BEKLEYEN LİNKLERİ EŞİTLEME (EKSİK OLAN KISIM)
+
       const syncPendingLinks = async () => {
         const pendingLinks = JSON.parse(localStorage.getItem("pending_links") || "[]");
         
@@ -46,7 +45,6 @@ export default function SessionObserver() {
       syncPendingLinks();
     }
 
-    // Çıkış yapınca temizleme mantığın doğru, kalsın.
   }, [status, session]);
 
   return null;
