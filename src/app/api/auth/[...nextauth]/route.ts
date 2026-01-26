@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { SupabaseAdapter } from "@auth/supabase-adapter";
 
-// 1. Başına 'export' ekleyerek dışarıdan erişilebilir hale getiriyoruz
+
 export const authOptions = {
   providers: [
     GoogleProvider({

@@ -76,7 +76,7 @@ export async function POST(request: Request) {
 
     // 2. PostgreSQL'e kaydet
     const { data, error } = await supabaseAdmin
-      .from("urls") // SQL'de oluşturduğun tablonun adı
+      .from("urls") 
       .insert([
         {
           original_url: normalized,

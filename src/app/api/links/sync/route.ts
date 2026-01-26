@@ -1,19 +1,18 @@
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-// authOptions'ı import ettiğinden emin ol (yolu projene göre ayarla)
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(request: Request) {
   try {
-    // ÖNEMLİ: getServerSession'a authOptions'ı geçmelisin
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
     }
 
     const { codes }: { codes: string[] } = await request.json();
-    console.log("Eşitlenecek kodlar:", codes); // Terminalden kontrol etmek için
+    console.log("Eşitlenecek kodlar:", codes); 
     console.log("Kullanıcı ID:", session.user.id);
 
     if (!codes || codes.length === 0) {
