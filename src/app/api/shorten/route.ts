@@ -10,17 +10,30 @@ import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase";
 import { authOptions } from "../auth/[...nextauth]/route";
 // Saniyede 1000 istek gelmesini engellemek için Redis tabanlı kısıtlayıcı
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(5, "60 s"), // 60 saniyede en fazla 5 istek
-  analytics: true,
-});
+
+const ENABLE_REDIS_RATELIMIT = false;
+let ratelimit: Ratelimit | null = null;
+if (ENABLE_REDIS_RATELIMIT) {
+  try {
+    ratelimit = new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.slidingWindow(5, "60 s"),
+      analytics: true,
+    });
+    console.log("✅ Redis rate limiter aktif");
+  } catch (error) {
+    console.error("❌ Redis başlatılamadı:", error);
+  }
+} else {
+  console.log("⚠️ Redis rate limiter devre dışı (geçici)");
+}
 const urlSchema = z.string().url();
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     const userId = session?.user?.id || null;
-    const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    if(ratelimit){
+      const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
     const identifier = userId ? `user:${userId}` : `ip:${ip}`;
     const { success, limit, reset, remaining } = await ratelimit.limit(identifier);
     if (!success) {
@@ -35,6 +48,7 @@ export async function POST(request: Request) {
           },
         },
       );
+    }
     }
     let { originalUrl }: { originalUrl: string } = await request.json();
     if (
